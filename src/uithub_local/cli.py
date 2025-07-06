@@ -26,7 +26,7 @@ from .downloader import download_repo
     "--max-size",
     type=int,
     default=DEFAULT_MAX_SIZE,
-    show_default=True,
+    show_default=f"{DEFAULT_MAX_SIZE} bytes",
     help="Skip files larger than this many bytes",
 )
 @click.option("--max-tokens", type=int, help="Hard cap; truncate largest files first")

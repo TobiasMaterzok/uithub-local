@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import io
+import time
 import urllib.parse
-import requests
+import requests  # type: ignore
 import zipfile
 from contextlib import contextmanager
 from pathlib import Path
@@ -23,8 +24,20 @@ def download_repo(url: str, token: str | None = None) -> Iterator[Path]:
         else:
             headers["Authorization"] = f"Bearer {token}"
 
-    response = requests.get(archive_url, headers=headers, timeout=30)
-    response.raise_for_status()
+    response = None
+    backoff = 1.0
+    for attempt in range(3):
+        response = requests.get(archive_url, headers=headers, timeout=30)
+        if response.status_code < 500:
+            break
+        if attempt < 2:
+            time.sleep(backoff)
+            backoff *= 2
+    assert response is not None
+    if response.status_code >= 400:
+        raise RuntimeError(
+            f"Failed to download {archive_url} (HTTP {response.status_code})"
+        )
     data = response.content
 
     tmp = TemporaryDirectory()
@@ -40,6 +53,9 @@ def download_repo(url: str, token: str | None = None) -> Iterator[Path]:
 
 
 def _archive_url(url: str) -> str:
+    if url.endswith(".zip"):
+        return url
+
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme in {"http", "https"}:
         host = parsed.netloc
@@ -53,6 +69,9 @@ def _archive_url(url: str) -> str:
 
     if host.endswith("github.com"):
         return f"https://api.github.com/repos/{slug}/zipball"
+    if host.endswith("gitlab.com"):
+        repo = slug.split("/")[-1]
+        return f"https://gitlab.com/{slug}/-/archive/master/{repo}-master.zip"
     if host.endswith("bitbucket.org"):
         return f"https://bitbucket.org/{slug}/get/master.zip"
     raise ValueError("Unsupported host")

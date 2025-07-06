@@ -43,7 +43,7 @@ class Dump:
             self._truncate(max_tokens)
 
     def _truncate(self, limit: int) -> None:
-        self.file_dumps.sort(key=lambda f: f.tokens, reverse=True)
+        self.file_dumps.sort(key=lambda f: (f.tokens, f.path.as_posix()), reverse=True)
         while self.total_tokens > limit and self.file_dumps:
             victim = self.file_dumps.pop(0)
             self.total_tokens -= victim.tokens
