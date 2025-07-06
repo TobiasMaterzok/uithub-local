@@ -6,4 +6,5 @@ __all__ = [
     "renderer",
     "tokenizer",
     "walker",
+    "downloader",
 ]

@@ -46,7 +46,7 @@ class Dump:
     def _truncate(self, limit: int) -> None:
         self.file_dumps.sort(key=lambda f: f.tokens, reverse=True)
         while self.total_tokens > limit and self.file_dumps:
-            victim = self.file_dumps.pop(0)
+            victim = self.file_dumps.pop()
             self.total_tokens -= victim.tokens
 
     def as_text(self, repo_name: str) -> str:

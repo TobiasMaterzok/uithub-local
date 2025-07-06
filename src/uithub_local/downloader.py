@@ -1,0 +1,58 @@
+"""Download and extract remote repositories."""
+
+from __future__ import annotations
+
+import io
+import urllib.parse
+import requests
+import zipfile
+from contextlib import contextmanager
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Iterator
+
+
+@contextmanager
+def download_repo(url: str, token: str | None = None) -> Iterator[Path]:
+    """Yield a temporary directory with the extracted repo from ``url``."""
+    archive_url = _archive_url(url)
+    headers = {}
+    if token:
+        if "github.com" in archive_url:
+            headers["Authorization"] = f"token {token}"
+        else:
+            headers["Authorization"] = f"Bearer {token}"
+
+    response = requests.get(archive_url, headers=headers, timeout=30)
+    response.raise_for_status()
+    data = response.content
+
+    tmp = TemporaryDirectory()
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            zf.extractall(tmp.name)
+        root_entries = list(Path(tmp.name).iterdir())
+        single = len(root_entries) == 1 and root_entries[0].is_dir()
+        root = root_entries[0] if single else Path(tmp.name)
+        yield root
+    finally:
+        tmp.cleanup()
+
+
+def _archive_url(url: str) -> str:
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme in {"http", "https"}:
+        host = parsed.netloc
+        path = parsed.path
+        if path.endswith(".git"):
+            path = path[:-4]
+        slug = path.strip("/")
+    else:
+        host = "github.com"
+        slug = url.strip("/")
+
+    if host.endswith("github.com"):
+        return f"https://api.github.com/repos/{slug}/zipball"
+    if host.endswith("bitbucket.org"):
+        return f"https://bitbucket.org/{slug}/get/master.zip"
+    raise ValueError("Unsupported host")
