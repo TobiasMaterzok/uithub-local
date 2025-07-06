@@ -30,6 +30,23 @@ def test_cli_outfile(tmp_path: Path):
     assert outfile.read_text()
 
 
+def test_cli_max_size(tmp_path: Path):
+    from uithub_local.walker import DEFAULT_MAX_SIZE
+
+    big = tmp_path / "big.txt"
+    big.write_bytes(b"x" * (DEFAULT_MAX_SIZE + 1))
+    (tmp_path / "small.txt").write_text("ok")
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path)])
+    assert result.exit_code == 0
+    assert "big.txt" not in result.output
+    result = runner.invoke(
+        main, [str(tmp_path), "--max-size", str(DEFAULT_MAX_SIZE * 2)]
+    )
+    assert result.exit_code == 0
+    assert "big.txt" in result.output
+
+
 @responses.activate
 def test_cli_remote(tmp_path: Path):
     data = io.BytesIO()

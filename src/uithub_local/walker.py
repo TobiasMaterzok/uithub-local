@@ -10,6 +10,8 @@ from typing import Iterable, List
 
 from .utils import is_binary_path
 
+DEFAULT_MAX_SIZE = 1_048_576
+
 
 @dataclass
 class FileInfo:
@@ -24,6 +26,7 @@ def collect_files(
     path: Path,
     include: Iterable[str] | None = None,
     exclude: Iterable[str] | None = None,
+    max_size: int = DEFAULT_MAX_SIZE,
 ) -> List[FileInfo]:
     """Return list of readable, non-binary files under *path*.
 
@@ -35,6 +38,8 @@ def collect_files(
         Glob patterns to include.
     exclude:
         Glob patterns to exclude.
+    max_size:
+        Skip files larger than this number of bytes.
     """
     include = list(include or ["*"])
     exclude = list(exclude or [])
@@ -56,6 +61,8 @@ def collect_files(
             if not os.access(file, os.R_OK):
                 continue
         except OSError:
+            continue
+        if stat.st_size > max_size:
             continue
         files.append(FileInfo(path=rel, size=stat.st_size, mtime=stat.st_mtime))
     return files

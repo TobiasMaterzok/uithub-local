@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
 
-from .loader import MAX_SIZE, load_text
+from .loader import load_text
 from .tokenizer import approximate_tokens
 from .walker import FileInfo
 
@@ -21,13 +21,12 @@ class FileDump:
         self.size = info.size
         self.tokens = 0
         self.content = ""
-        if self.size <= MAX_SIZE:
-            try:
-                self.content = load_text(self.full_path)
-                self.tokens = approximate_tokens(self.content)
-            except Exception:
-                self.content = ""
-                self.tokens = 0
+        try:
+            self.content = load_text(self.full_path)
+            self.tokens = approximate_tokens(self.content)
+        except Exception:
+            self.content = ""
+            self.tokens = 0
 
 
 class Dump:
@@ -46,7 +45,7 @@ class Dump:
     def _truncate(self, limit: int) -> None:
         self.file_dumps.sort(key=lambda f: f.tokens, reverse=True)
         while self.total_tokens > limit and self.file_dumps:
-            victim = self.file_dumps.pop()
+            victim = self.file_dumps.pop(0)
             self.total_tokens -= victim.tokens
 
     def as_text(self, repo_name: str) -> str:
