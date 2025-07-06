@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uithub-local"
+version = "0.1.0"
+description = "Local Uithub CLI to flatten Git repositories into text dumps."
+authors = [{name = "Codex", email = "codex@example.com"}]
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8",
+    "tiktoken>=0.5",
+    "requests>=2.31",
+]
+
+[project.scripts]
+uithub = "uithub_local.cli:main"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "freezegun>=1.4",
+    "responses",
+]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=uithub_local -q"
