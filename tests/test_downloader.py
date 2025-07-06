@@ -4,7 +4,7 @@ import zipfile
 import responses
 import pytest
 
-from uithub_local.downloader import download_repo
+from uithub_local.downloader import download_repo, _archive_url
 
 
 @responses.activate
@@ -39,8 +39,32 @@ def test_download_repo_with_token():
         assert (path / "f.txt").read_text() == "x"
 
 
-def test_archive_url_invalid():
-    from uithub_local.downloader import _archive_url
+@responses.activate
+def test_download_repo_gitlab_retry(tmp_path):
+    data = io.BytesIO()
+    with zipfile.ZipFile(data, "w") as zf:
+        zf.writestr("repo/g.txt", "hi")
+    url = "https://gitlab.com/foo/bar/-/archive/master/bar-master.zip"
+    responses.add(responses.GET, url, status=500)
+    responses.add(
+        responses.GET,
+        url,
+        body=data.getvalue(),
+        status=200,
+        content_type="application/zip",
+    )
+    with download_repo("https://gitlab.com/foo/bar") as path:
+        assert (path / "g.txt").read_text() == "hi"
+    assert len(responses.calls) == 2
 
+
+def test_archive_url_invalid():
     with pytest.raises(ValueError):
         _archive_url("https://example.com/foo.git")
+
+
+def test_archive_url_gitlab_and_zip():
+    gitlab = _archive_url("https://gitlab.com/foo/bar")
+    assert gitlab == "https://gitlab.com/foo/bar/-/archive/master/bar-master.zip"
+    direct = _archive_url("https://example.com/archive.zip")
+    assert direct == "https://example.com/archive.zip"

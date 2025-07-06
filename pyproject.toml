@@ -13,8 +13,15 @@ dependencies = [
     "tiktoken>=0.5",
 ]
 
+[project.optional-dependencies.test]
+freezegun = ">=1.4"
+responses = ">=0.25"
+pytest = "*"
+pytest-cov = "*"
+
 [project.scripts]
 uithub = "uithub_local.cli:main"
+test = "pytest --cov=uithub_local -q"
 
 [tool.black]
 line-length = 88
