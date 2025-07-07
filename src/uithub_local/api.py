@@ -19,19 +19,17 @@ def dump_repo(
 ) -> str:
     """Return a repository dump as a string.
 
-    Parameters
-    ----------
-    path_or_url:
-        Local directory or remote repository URL.
-    fmt:
-        Output format ("text", "json" or "html").
-    encoding:
-        Encoding to use when writing the returned dump to disk.
-    **cli_kwargs:
-        Extra options matching the CLI, such as ``include``, ``exclude``,
-        ``max_size``, ``max_tokens``, ``binary_strict`` and ``private_token``.
-    This function does not write to disk. Callers can write the returned
-    string using ``Path.write_text(output, encoding=encoding)``.
+    Args:
+        path_or_url: Local directory or remote repository URL.
+        fmt: Output format ("text", "json" or "html").
+        encoding: Suggested encoding if the caller writes the dump to disk. The
+            value is not used by ``dump_repo`` itself.
+        **cli_kwargs: Extra options matching the CLI such as ``include``,
+            ``exclude``, ``max_size``, ``max_tokens``, ``binary_strict`` and
+            ``private_token``.
+
+    Returns:
+        The rendered dump.
     """
 
     include = cli_kwargs.get("include", ["*"])
