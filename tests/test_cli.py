@@ -104,7 +104,7 @@ def test_cli_html(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(main, [str(tmp_path), "--format", "html"])
     assert result.exit_code == 0
-    assert "<details>" in result.output
+    assert "<details class='file-card'>" in result.output
 
 
 def test_cli_exclude_directory(tmp_path: Path):

@@ -51,7 +51,7 @@ def test_render_html(tmp_path: Path):
     files = collect_files(tmp_path, ["*"], [])
     output = render(files, tmp_path, fmt="html")
     assert "<h1>Uithub-local dump" in output
-    assert "<details>" in output
+    assert "<details class='file-card'>" in output
     assert "hello" in output
 
 
