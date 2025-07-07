@@ -1,5 +1,7 @@
 """Local Uithub package."""
 
+from .api import dump_repo
+
 __all__ = [
     "cli",
     "loader",
@@ -7,4 +9,5 @@ __all__ = [
     "tokenizer",
     "walker",
     "downloader",
+    "dump_repo",
 ]

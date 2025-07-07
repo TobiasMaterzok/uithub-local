@@ -81,14 +81,15 @@ class Dump:
             "<style>"
             "body{font-family:monospace;white-space:pre-wrap;}"
             "details{margin-bottom:1em;}"
-            "summary{font-weight:bold;cursor:pointer;}"
+            "summary{font-weight:bold;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}"
             "</style>"
         )
         lines = [
             "<!DOCTYPE html>",
-            "<html>",
+            '<html lang="en">',
             "<head>",
             '<meta charset="UTF-8">',
+            '<meta name="viewport" content="width=device-width,initial-scale=1">',
             f"<title>{repo_name} dump</title>",
             style,
             "</head>",

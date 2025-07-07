@@ -4,13 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uithub-local"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local Uithub CLI to flatten Git repositories into text dumps."
 authors = [{name = "Codex", email = "codex@example.com"}]
+license = {text = "MIT"}
+keywords = ["llm", "rag", "context", "github"]
 requires-python = ">=3.11"
 dependencies = [
     "click>=8",
     "tiktoken>=0.5",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
 ]
 
 [project.optional-dependencies]
@@ -36,4 +44,4 @@ python_version = "3.11"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=uithub_local -q"
+addopts = "--cov=uithub_local --cov-fail-under=90 -q"
