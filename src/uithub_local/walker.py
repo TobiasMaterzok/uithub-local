@@ -51,7 +51,7 @@ def collect_files(
     root = Path(path)
 
     def _expand(pattern: str) -> str:
-        # normalise platform separators
+        # normalize platform separators
         pat = pattern.replace("\\", "/").rstrip("/")
         if pat in {"*", "**"}:
             return pat
