@@ -13,7 +13,7 @@ uithub --remote-url https://github.com/owner/repo
 
 ## Usage
 
-Run `uithub --help` for all options. The dump can be printed to STDOUT or saved to a file. JSON output is available using `--format json`. Remote repositories can be processed with `--remote-url`; provide `--private-token` or set `GITHUB_TOKEN` for private repos. Use `--max-size` to skip files larger than the given number of bytes (default 1048576).
+Run `uithub --help` for all options. The dump can be printed to STDOUT or saved to a file. JSON output is available using `--format json`. Use `--format html` for a self-contained HTML dump with collapsible sections. Remote repositories can be processed with `--remote-url`; provide `--private-token` or set `GITHUB_TOKEN` for private repos. Use `--max-size` to skip files larger than the given number of bytes (default 1048576).
 
 ### Running the test-suite
 
@@ -21,7 +21,7 @@ Install development dependencies and run tests:
 
 ```bash
 pip install .[test]
-uithub-local.test
+python -m pytest
 ```
 
 ### Adjusting file size limit

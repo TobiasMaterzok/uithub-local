@@ -6,6 +6,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
+import html
 
 from .loader import load_text
 from .tokenizer import approximate_tokens
@@ -74,6 +75,37 @@ class Dump:
         }
         return json.dumps(obj, indent=2)
 
+    def as_html(self, repo_name: str) -> str:
+        timestamp = datetime.now(timezone.utc).isoformat()
+        style = (
+            "<style>"
+            "body{font-family:monospace;white-space:pre-wrap;}"
+            "details{margin-bottom:1em;}"
+            "summary{font-weight:bold;cursor:pointer;}"
+            "</style>"
+        )
+        lines = [
+            "<!DOCTYPE html>",
+            "<html>",
+            "<head>",
+            '<meta charset="UTF-8">',
+            f"<title>{repo_name} dump</title>",
+            style,
+            "</head>",
+            "<body>",
+            f"<h1>Uithub-local dump – {repo_name} – {timestamp}</h1>",
+            f"<p>≈ {self.total_tokens} tokens</p>",
+        ]
+        for fd in self.file_dumps:
+            lines.append("<details>")
+            lines.append(f"<summary>{fd.path.as_posix()}</summary>")
+            lines.append("<pre>")
+            lines.append(html.escape(fd.content))
+            lines.append("</pre>")
+            lines.append("</details>")
+        lines.append("</body></html>")
+        return "\n".join(lines)
+
 
 def render(
     files: List[FileInfo],
@@ -86,4 +118,6 @@ def render(
     repo_name = root.name
     if fmt == "json":
         return dump.as_json(repo_name)
+    if fmt == "html":
+        return dump.as_html(repo_name)
     return dump.as_text(repo_name)
