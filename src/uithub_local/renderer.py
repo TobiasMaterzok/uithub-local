@@ -116,7 +116,8 @@ def render(
     fmt: str = "text",
 ) -> str:
     dump = Dump(files, root, max_tokens)
-    repo_name = root.name
+    resolved = root.resolve()
+    repo_name = resolved.name or resolved.parent.name
     if fmt == "json":
         return dump.as_json(repo_name)
     if fmt == "html":

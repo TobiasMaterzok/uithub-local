@@ -103,3 +103,24 @@ def test_cli_html(tmp_path: Path):
     result = runner.invoke(main, [str(tmp_path), "--format", "html"])
     assert result.exit_code == 0
     assert "<details>" in result.output
+
+
+def test_cli_exclude_directory(tmp_path: Path):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".git" / "data").write_text("x")
+    (tmp_path / "a.txt").write_text("hi")
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path), "--exclude", ".git"])
+    assert result.exit_code == 0
+    assert ".git/data" not in result.output
+    assert "a.txt" in result.output
+
+
+def test_cli_auto_excludes_git(tmp_path: Path):
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".git" / "config").write_text("x")
+    (tmp_path / "a.txt").write_text("hi")
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path)])
+    assert result.exit_code == 0
+    assert ".git/config" not in result.output
