@@ -2,6 +2,9 @@
 
 Flatten a local Git repository into a single text dump with an approximate token count.
 
+## About
+Uithub-local packages repository contents into plain text, JSON or HTML dumps. Use it to prep code for large-context LLMs or save lightweight archives.
+
 ## Quick Start
 
 ```bash
