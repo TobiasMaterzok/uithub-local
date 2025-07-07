@@ -83,9 +83,11 @@ def test_cli_remote(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(
         main,
-        ["--remote-url", "https://github.com/foo/bar", "--no-stdout"],
+        ["--remote-url", "https://github.com/foo/bar"],
     )
     assert result.exit_code == 0
+    assert "file.txt" in result.output
+    assert "hi" in result.output
 
 
 def test_cli_no_binary_strict(tmp_path: Path):
