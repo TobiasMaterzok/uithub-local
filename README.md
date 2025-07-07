@@ -31,11 +31,11 @@ uithub path/to/repo --outfile dump.txt --encoding utf-8
 
 ### Running the test-suite
 
-Install development dependencies and run tests:
+Install development dependencies and run tests with coverage:
 
 ```bash
 pip install .[test]
-python -m pytest
+pytest --cov=uithub_local -q
 ```
 
 ### Adjusting file size limit
