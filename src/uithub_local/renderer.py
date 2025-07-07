@@ -77,13 +77,40 @@ class Dump:
 
     def as_html(self, repo_name: str) -> str:
         timestamp = datetime.now(timezone.utc).isoformat()
-        style = (
-            "<style>"
-            "body{font-family:monospace;white-space:pre-wrap;}"
-            "details{margin-bottom:1em;}"
-            "summary{font-weight:bold;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}"
-            "</style>"
-        )
+        style = """
+        <style>
+        body {background:#f7f7f7;font:16px/1.5 system-ui,monospace;}
+        .container {max-width:800px;margin:2rem auto;}
+        details {margin:0.5rem 0;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+        summary {
+            background:#34495e;
+            color:#fff;
+            font-weight:bold;
+            padding:0.75rem 1rem;
+            border:1px solid #2c3e50;
+            border-radius:4px;
+            cursor:pointer;
+            display:block;
+        }
+        summary:hover {background:#3b5770;}
+        summary::marker {transition:transform 0.2s;}
+        details[open] summary::marker {transform:rotate(90deg);}
+        details[open] > summary {
+            border-bottom-left-radius:0;
+            border-bottom-right-radius:0;
+        }
+        pre {
+            background:#fff;
+            font-family:monospace;
+            overflow:auto;
+            padding:1rem;
+            margin:0;
+            border:1px solid #2c3e50;
+            border-top:none;
+            border-radius:0 0 4px 4px;
+        }
+        </style>
+        """
         lines = [
             "<!DOCTYPE html>",
             '<html lang="en">',
@@ -94,17 +121,18 @@ class Dump:
             style,
             "</head>",
             "<body>",
+            "<div class='container'>",
             f"<h1>Uithub-local dump – {repo_name} – {timestamp}</h1>",
             f"<p>≈ {self.total_tokens} tokens</p>",
         ]
         for fd in self.file_dumps:
             lines.append("<details>")
             lines.append(f"<summary>{fd.path.as_posix()}</summary>")
-            lines.append("<pre>")
+            lines.append("<pre><code>")
             lines.append(html.escape(fd.content))
-            lines.append("</pre>")
+            lines.append("</code></pre>")
             lines.append("</details>")
-        lines.append("</body></html>")
+        lines.append("</div></body></html>")
         return "\n".join(lines)
 
 
