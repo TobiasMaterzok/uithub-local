@@ -79,42 +79,100 @@ class Dump:
         timestamp = datetime.now(timezone.utc).isoformat()
         style = """
         <style>
-        body {background:#f7f7f7;font:16px/1.5 system-ui,monospace;}
-        .container {max-width:800px;margin:2rem auto;}
-        details {margin:0.5rem 0;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
-        summary {
-            background:#34495e;
-            color:#fff;
-            font-weight:bold;
-            padding:0.75rem 1rem;
-            border:1px solid #2c3e50;
-            border-radius:4px;
-            cursor:pointer;
+        html {
+            font-size:14px;
+            font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        body {
+            margin:0;
+            background:#0d1117;
+            color:#c9d1d9;
+        }
+        .container {
+            max-width:1100px;
+            padding:2rem;
+            margin:0 auto;
+            display:flex;
+            flex-direction:column;
+            gap:1rem;
+        }
+        .header-card, details.file-card {
+            border:1px solid #30363d;
+            border-radius:6px;
+            box-shadow:0 2px 4px rgba(0,0,0,.6);
+            background:#161b22;
+        }
+        .header-card {
+            padding:1rem 1.25rem;
+        }
+        .header-card h1 {
+            margin:0 0 .5rem;
+            font-size:1.25rem;
+        }
+        .header-card p {
+            margin:0;
+            color:#8b949e;
+            font-size:.9rem;
+        }
+        details.file-card summary {
             display:flex;
             align-items:center;
+            gap:.75rem;
+            padding:.8rem 1rem;
+            cursor:pointer;
+            background:#161b22;
+            color:inherit;
+            list-style:none;
         }
-        summary:hover {background:#3b5770;}
-        summary::-webkit-details-marker {display:none;}
-        summary::before {
-            content:'\25B6';
-            display:inline-block;
-            margin-right:0.5rem;
-            transition:transform 0.2s;
+        details.file-card summary:hover {
+            background:#21262d;
         }
-        details[open] summary::before {transform:rotate(90deg);}
-        details[open] > summary {
-            border-bottom-left-radius:0;
-            border-bottom-right-radius:0;
+        details.file-card summary::-webkit-details-marker {display:none;}
+        .chevron {
+            fill:#58a6ff;
+            transition:transform .15s;
+            flex:none;
         }
-        pre {
-            background:#fff;
-            font-family:monospace;
-            overflow:auto;
-            padding:1rem;
+        @media (prefers-reduced-motion: reduce) {
+            .chevron {transition:none;}
+        }
+        details.file-card[open] > summary .chevron {
+            transform:rotate(90deg);
+        }
+        summary:focus-visible {
+            outline:2px solid #58a6ff;
+            outline-offset:2px;
+        }
+        .path {
+            font-weight:bold;
+            flex:1;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            direction:rtl;
+        }
+        .badge {
+            font-size:.7rem;
+            background:#238636;
+            color:#fff;
+            padding:.15rem .45rem;
+            border-radius:9999px;
+        }
+        details.file-card pre {
+            background:#0d1117;
+            padding:1rem 1.25rem;
             margin:0;
-            border:1px solid #2c3e50;
-            border-top:none;
-            border-radius:0 0 4px 4px;
+            overflow:auto;
+            line-height:1.45;
+            white-space:pre;
+            border-top:1px solid #30363d;
+            border-radius:0 0 6px 6px;
+            background-image:linear-gradient(transparent 97%,
+                rgba(255,255,255,.05) 97%);
+            background-size:100% 1.6em;
+        }
+        @media (max-width:600px) {
+            .container {padding:1rem;}
         }
         </style>
         """
@@ -129,12 +187,22 @@ class Dump:
             "</head>",
             "<body>",
             "<div class='container'>",
-            f"<h1>Uithub-local dump – {repo_name} – {timestamp}</h1>",
-            f"<p>≈ {self.total_tokens} tokens</p>",
+            "<div class='header-card'>",
+            f"<h1>Uithub-local dump – {repo_name}</h1>",
+            f"<p>{timestamp} \u00b7 \u2248 {self.total_tokens} tokens</p>",
+            "</div>",
         ]
         for fd in self.file_dumps:
-            lines.append("<details>")
-            lines.append(f"<summary>{fd.path.as_posix()}</summary>")
+            path = html.escape(fd.path.as_posix())
+            lines.append("<details class='file-card'>")
+            lines.append(
+                "<summary>"
+                "<svg class='chevron' width='10' height='10'"
+                " viewBox='0 0 8 8' aria-hidden='true'>"
+                "<path d='M0 0 L6 4 L0 8z'/></svg>"
+                f"<span class='path'>{path}</span>"
+                "</summary>"
+            )
             lines.append("<pre><code>")
             lines.append(html.escape(fd.content))
             lines.append("</code></pre>")
