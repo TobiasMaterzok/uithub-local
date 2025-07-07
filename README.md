@@ -23,6 +23,11 @@ To save an HTML dump and open it in your default browser:
 uithub path/to/repo --format html --outfile dump.html && xdg-open dump.html
 ```
 
+The generated HTML arranges files in collapsible "file cards". Each card has a
+dark header bar, a white code block beneath, and a disclosure arrow that rotates
+on open. Cards are centered on a light-gray page and include a subtle drop
+shadow for separation.
+
 Save a plain text dump with explicit encoding:
 
 ```bash

@@ -90,11 +90,18 @@ class Dump:
             border:1px solid #2c3e50;
             border-radius:4px;
             cursor:pointer;
-            display:block;
+            display:flex;
+            align-items:center;
         }
         summary:hover {background:#3b5770;}
-        summary::marker {transition:transform 0.2s;}
-        details[open] summary::marker {transform:rotate(90deg);}
+        summary::-webkit-details-marker {display:none;}
+        summary::before {
+            content:'\25B6';
+            display:inline-block;
+            margin-right:0.5rem;
+            transition:transform 0.2s;
+        }
+        details[open] summary::before {transform:rotate(90deg);}
         details[open] > summary {
             border-bottom-left-radius:0;
             border-bottom-right-radius:0;
