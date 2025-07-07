@@ -27,6 +27,8 @@ def collect_files(
     include: Iterable[str] | None = None,
     exclude: Iterable[str] | None = None,
     max_size: int = DEFAULT_MAX_SIZE,
+    *,
+    binary_strict: bool = True,
 ) -> List[FileInfo]:
     """Return list of readable, non-binary files under *path*.
 
@@ -40,6 +42,8 @@ def collect_files(
         Glob patterns to exclude.
     max_size:
         Skip files larger than this number of bytes.
+    binary_strict:
+        Use strict binary detection.
     """
     include = list(include or ["*"])
     exclude = list(exclude or [])
@@ -54,7 +58,7 @@ def collect_files(
             continue
         if any(fnmatch.fnmatch(str(rel), pattern) for pattern in exclude):
             continue
-        if is_binary_path(file):
+        if is_binary_path(file, strict=binary_strict):
             continue
         try:
             stat = file.stat()

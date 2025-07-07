@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 import click
 
@@ -30,7 +30,17 @@ from .downloader import download_repo
     help="Skip files larger than this many bytes",
 )
 @click.option("--max-tokens", type=int, help="Hard cap; truncate largest files first")
-@click.option("--format", "fmt", type=click.Choice(["text", "json"]), default="text")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["text", "json", "html"]),
+    default="text",
+)
+@click.option(
+    "--binary-strict/--no-binary-strict",
+    default=True,
+    help="Use strict binary detection",
+)
 @click.option("--stdout/--no-stdout", default=True, help="Print dump to STDOUT")
 @click.option("--outfile", type=click.Path(path_type=Path), help="Write dump to file")
 @click.version_option()
@@ -43,6 +53,7 @@ def main(
     max_size: int,
     max_tokens: int | None,
     fmt: str,
+    binary_strict: bool,
     stdout: bool,
     outfile: Path | None,
 ) -> None:
@@ -55,11 +66,23 @@ def main(
     try:
         if remote_url:
             with download_repo(remote_url, private_token) as tmp:
-                files = collect_files(tmp, include, exclude, max_size=max_size)
+                files = collect_files(
+                    tmp,
+                    include,
+                    exclude,
+                    max_size=max_size,
+                    binary_strict=binary_strict,
+                )
                 output = render(files, tmp, max_tokens=max_tokens, fmt=fmt)
         else:
-            files = collect_files(path, include, exclude, max_size=max_size)  # type: ignore[arg-type]
-            output = render(files, path, max_tokens=max_tokens, fmt=fmt)  # type: ignore[arg-type]
+            files = collect_files(
+                cast(Path, path),
+                include,
+                exclude,
+                max_size=max_size,
+                binary_strict=binary_strict,
+            )
+            output = render(files, cast(Path, path), max_tokens=max_tokens, fmt=fmt)
     except Exception as exc:  # pragma: no cover - fatal CLI errors
         click.echo(str(exc), err=True)
         raise SystemExit(1)

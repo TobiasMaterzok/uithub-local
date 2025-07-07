@@ -1,9 +1,10 @@
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
+import pytest
 
 from freezegun import freeze_time
 
 from uithub_local.renderer import render
-from uithub_local.walker import collect_files
+from uithub_local.walker import collect_files, FileInfo
 from uithub_local.tokenizer import approximate_tokens
 
 
@@ -42,3 +43,23 @@ def test_render_truncate(tmp_path: Path):
     output = render(files, tmp_path, max_tokens=approximate_tokens("a" * 100))
     assert "a.txt" in output
     assert "b.txt" not in output
+
+
+@freeze_time("2024-01-01T00:00:00+00:00")
+def test_render_html(tmp_path: Path):
+    (tmp_path / "a.txt").write_text("hello")
+    files = collect_files(tmp_path, ["*"], [])
+    output = render(files, tmp_path, fmt="html")
+    assert "<h1>Uithub-local dump" in output
+    assert "<details>" in output
+    assert "hello" in output
+
+
+@freeze_time("2024-01-01T00:00:00+00:00")
+@pytest.mark.parametrize("path_cls", [Path, PureWindowsPath])
+def test_render_windows_paths(tmp_path: Path, path_cls):
+    (tmp_path / "a.txt").write_text("hello")
+    files = collect_files(tmp_path, ["*"], [])
+    files = [FileInfo(path_cls(f.path.as_posix()), f.size, f.mtime) for f in files]
+    output = render(files, tmp_path)
+    assert "a.txt" in output

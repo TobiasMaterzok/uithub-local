@@ -65,3 +65,20 @@ def test_cli_remote(tmp_path: Path):
         ["--remote-url", "https://github.com/foo/bar", "--no-stdout"],
     )
     assert result.exit_code == 0
+
+
+def test_cli_no_binary_strict(tmp_path: Path):
+    noisy = tmp_path / "n.txt"
+    noisy.write_bytes(b"\x80" * 40 + b"a" * 10)
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path), "--no-binary-strict"])
+    assert result.exit_code == 0
+    assert "n.txt" in result.output
+
+
+def test_cli_html(tmp_path: Path):
+    (tmp_path / "a.txt").write_text("hello")
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path), "--format", "html"])
+    assert result.exit_code == 0
+    assert "<details>" in result.output
