@@ -50,6 +50,21 @@ def collect_files(
     files: List[FileInfo] = []
     root = Path(path)
 
+    def expand(pattern: str) -> str:
+        if pattern.endswith(os.sep) or pattern in {"*", "**"}:
+            return pattern
+        if (root / pattern).is_dir():
+            return f"{pattern}/**"
+        return pattern
+
+    include = [expand(p) for p in include]
+    exclude = [expand(p) for p in exclude]
+
+    if (root / ".git").is_dir():
+        git_included = any(pat.lstrip("./").startswith(".git") for pat in include)
+        if not git_included:
+            exclude.append(".git/**")
+
     for file in root.rglob("*"):
         rel = file.relative_to(root)
         if not file.is_file():

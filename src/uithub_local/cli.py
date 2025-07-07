@@ -20,8 +20,20 @@ from .downloader import download_repo
 )
 @click.option("--remote-url", help="Git repo URL to download")
 @click.option("--private-token", envvar="GITHUB_TOKEN", help="Token for private repos")
-@click.option("--include", multiple=True, default=["*"], help="Glob(s) to include")
-@click.option("--exclude", multiple=True, help="Glob(s) to exclude")
+@click.option(
+    "--include",
+    multiple=True,
+    default=["*"],
+    help="Glob(s) to include. Directory names include everything below them.",
+)
+@click.option(
+    "--exclude",
+    multiple=True,
+    help=(
+        "Glob(s) to exclude. Directory names exclude everything below them. "
+        "'.git/' is excluded by default."
+    ),
+)
 @click.option(
     "--max-size",
     type=int,

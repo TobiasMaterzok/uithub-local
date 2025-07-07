@@ -63,3 +63,12 @@ def test_render_windows_paths(tmp_path: Path, path_cls):
     files = [FileInfo(path_cls(f.path.as_posix()), f.size, f.mtime) for f in files]
     output = render(files, tmp_path)
     assert "a.txt" in output
+
+
+@freeze_time("2024-01-01T00:00:00+00:00")
+def test_render_repo_name_dot(tmp_path: Path, monkeypatch):
+    (tmp_path / "a.txt").write_text("hi")
+    monkeypatch.chdir(tmp_path)
+    files = collect_files(Path("."), ["*"], [])
+    output = render(files, Path("."))
+    assert tmp_path.name in output.splitlines()[0]
