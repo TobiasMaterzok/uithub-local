@@ -21,6 +21,12 @@ To save an HTML dump and open it in your default browser:
 uithub path/to/repo --format html --outfile dump.html && xdg-open dump.html
 ```
 
+Save a plain text dump with explicit encoding:
+
+```bash
+uithub path/to/repo --outfile dump.txt --encoding utf-8
+```
+
 ### Running the test-suite
 
 Install development dependencies and run tests:
@@ -39,6 +45,10 @@ uithub path/to/repo --max-size $((2 * 1048576))
 ```
 
 ## Changelog
+
+### 0.1.2
+- Added ``--encoding`` option for file output.
+- Fixed UTF-8 writes when saving dumps.
 
 ### 0.1.1
 - HTML export improvements (lang attribute, mobile viewport, truncated summaries).

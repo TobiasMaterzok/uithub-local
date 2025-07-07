@@ -43,6 +43,12 @@ from .downloader import download_repo
 )
 @click.option("--stdout/--no-stdout", default=True, help="Print dump to STDOUT")
 @click.option("--outfile", type=click.Path(path_type=Path), help="Write dump to file")
+@click.option(
+    "--encoding",
+    default="utf-8",
+    show_default=True,
+    help="Encoding for --outfile",
+)
 @click.version_option()
 def main(
     path: Path | None,
@@ -56,6 +62,7 @@ def main(
     binary_strict: bool,
     stdout: bool,
     outfile: Path | None,
+    encoding: str,
 ) -> None:
     """Flatten a repository into one text dump."""
     if remote_url and path:
@@ -88,7 +95,7 @@ def main(
         raise SystemExit(1)
 
     if outfile:
-        outfile.write_text(output)
+        outfile.write_text(output, encoding=encoding, errors="replace")
     if stdout:
         click.echo(output)
 
