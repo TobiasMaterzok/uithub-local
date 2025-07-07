@@ -10,7 +10,13 @@ from .renderer import render
 from .walker import DEFAULT_MAX_SIZE, collect_files
 
 
-def dump_repo(path_or_url: str | Path, *, fmt: str = "text", **cli_kwargs: Any) -> str:
+def dump_repo(
+    path_or_url: str | Path,
+    *,
+    fmt: str = "text",
+    encoding: str = "utf-8",
+    **cli_kwargs: Any,
+) -> str:
     """Return a repository dump as a string.
 
     Parameters
@@ -19,9 +25,13 @@ def dump_repo(path_or_url: str | Path, *, fmt: str = "text", **cli_kwargs: Any) 
         Local directory or remote repository URL.
     fmt:
         Output format ("text", "json" or "html").
+    encoding:
+        Encoding to use when writing the returned dump to disk.
     **cli_kwargs:
         Extra options matching the CLI, such as ``include``, ``exclude``,
         ``max_size``, ``max_tokens``, ``binary_strict`` and ``private_token``.
+    This function does not write to disk. Callers can write the returned
+    string using ``Path.write_text(output, encoding=encoding)``.
     """
 
     include = cli_kwargs.get("include", ["*"])

@@ -30,6 +30,27 @@ def test_cli_outfile(tmp_path: Path):
     assert outfile.read_text()
 
 
+def test_cli_outfile_utf8(tmp_path: Path):
+    (tmp_path / "a.txt").write_text("hi")
+    out = tmp_path / "out.txt"
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path), "--outfile", str(out)])
+    assert result.exit_code == 0
+    assert out.read_text(encoding="utf-8").startswith("# Uithub-local")
+
+
+def test_cli_outfile_cp1252(tmp_path: Path):
+    (tmp_path / "a.txt").write_text("hi")
+    out = tmp_path / "o.txt"
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [str(tmp_path), "--outfile", str(out), "--encoding", "cp1252", "--no-stdout"],
+    )
+    assert result.exit_code == 0
+    assert out.read_text(encoding="cp1252").startswith("# Uithub-local")
+
+
 def test_cli_max_size(tmp_path: Path):
     from uithub_local.walker import DEFAULT_MAX_SIZE
 
