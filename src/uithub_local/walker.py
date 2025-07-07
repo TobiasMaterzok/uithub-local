@@ -50,15 +50,17 @@ def collect_files(
     files: List[FileInfo] = []
     root = Path(path)
 
-    def expand(pattern: str) -> str:
-        if pattern.endswith(os.sep) or pattern in {"*", "**"}:
-            return pattern
-        if (root / pattern).is_dir():
-            return f"{pattern}/**"
+    def _expand(pattern: str) -> str:
+        # normalise platform separators
+        pat = pattern.replace("\\", "/").rstrip("/")
+        if pat in {"*", "**"}:
+            return pat
+        if (root / pat).is_dir():
+            return f"{pat}/**"  # recurse
         return pattern
 
-    include = [expand(p) for p in include]
-    exclude = [expand(p) for p in exclude]
+    include = [_expand(p) for p in include]
+    exclude = [_expand(p) for p in exclude]
 
     if (root / ".git").is_dir():
         git_included = any(pat.lstrip("./").startswith(".git") for pat in include)
@@ -67,11 +69,12 @@ def collect_files(
 
     for file in root.rglob("*"):
         rel = file.relative_to(root)
+        rel_path = str(rel).replace("\\", "/")
         if not file.is_file():
             continue
-        if not any(fnmatch.fnmatch(str(rel), pattern) for pattern in include):
+        if not any(fnmatch.fnmatch(rel_path, pattern) for pattern in include):
             continue
-        if any(fnmatch.fnmatch(str(rel), pattern) for pattern in exclude):
+        if any(fnmatch.fnmatch(rel_path, pattern) for pattern in exclude):
             continue
         if is_binary_path(file, strict=binary_strict):
             continue

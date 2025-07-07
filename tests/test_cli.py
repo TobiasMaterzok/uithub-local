@@ -116,6 +116,17 @@ def test_cli_exclude_directory(tmp_path: Path):
     assert "a.txt" in result.output
 
 
+def test_cli_exclude_tests(tmp_path: Path):
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "a.txt").write_text("x")
+    (tmp_path / "b.txt").write_text("y")
+    runner = CliRunner()
+    result = runner.invoke(main, [str(tmp_path), "--exclude", "tests/"])
+    assert result.exit_code == 0
+    assert "tests/a.txt" not in result.output
+    assert "b.txt" in result.output
+
+
 def test_cli_auto_excludes_git(tmp_path: Path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".git" / "config").write_text("x")

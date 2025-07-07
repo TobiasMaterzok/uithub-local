@@ -7,8 +7,8 @@ Flatten a local Git repository into a single text dump with an approximate token
 ```bash
 pip install .
 
-# exclude entire directories with trailing slashes
-uithub path/to/repo --include "*.py" --exclude "tests/" 
+# trailing slash means recursive
+uithub path/to/repo --include "*.py" --exclude "tests/"
 uithub --remote-url https://github.com/owner/repo
 ```
 

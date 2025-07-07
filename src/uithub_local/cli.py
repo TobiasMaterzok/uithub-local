@@ -24,13 +24,13 @@ from .downloader import download_repo
     "--include",
     multiple=True,
     default=["*"],
-    help="Glob(s) to include. Directory names include everything below them.",
+    help=("Glob(s) to include. Trailing '/' or '\\' expands recursively."),
 )
 @click.option(
     "--exclude",
     multiple=True,
     help=(
-        "Glob(s) to exclude. Directory names exclude everything below them. "
+        "Glob(s) to exclude. Trailing '/' or '\\' expands recursively. "
         "'.git/' is excluded by default."
     ),
 )

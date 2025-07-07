@@ -31,3 +31,29 @@ def test_collect_files_exclude_dir(tmp_path):
     names = {f.path.as_posix() for f in files}
     assert "a.txt" in names
     assert not any(n.startswith(".git/") for n in names)
+
+
+def test_collect_files_trailing_slash(tmp_path):
+    from uithub_local.walker import collect_files
+
+    tests = tmp_path / "tests"
+    tests.mkdir()
+    (tests / "a.txt").write_text("x")
+    (tmp_path / "b.txt").write_text("y")
+
+    names = {f.path.as_posix() for f in collect_files(tmp_path, ["*"], ["tests/"])}
+    assert "b.txt" in names
+    assert not any(n.startswith("tests/") for n in names)
+
+
+def test_collect_files_trailing_backslash(tmp_path):
+    from uithub_local.walker import collect_files
+
+    tests = tmp_path / "tests"
+    tests.mkdir()
+    (tests / "a.txt").write_text("x")
+    (tmp_path / "b.txt").write_text("y")
+
+    names = {f.path.as_posix() for f in collect_files(tmp_path, ["*"], ["tests\\"])}
+    assert "b.txt" in names
+    assert not any(n.startswith("tests/") for n in names)
