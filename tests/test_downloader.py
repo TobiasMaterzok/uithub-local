@@ -68,3 +68,8 @@ def test_archive_url_gitlab_and_zip():
     assert gitlab == "https://gitlab.com/foo/bar/-/archive/master/bar-master.zip"
     direct = _archive_url("https://example.com/archive.zip")
     assert direct == "https://example.com/archive.zip"
+
+
+def test_archive_url_scp_style():
+    url = _archive_url("git@github.com:foo/bar.git")
+    assert url == "https://api.github.com/repos/foo/bar/zipball"
