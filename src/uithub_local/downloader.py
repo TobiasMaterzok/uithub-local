@@ -57,15 +57,21 @@ def _archive_url(url: str) -> str:
         return url
 
     parsed = urllib.parse.urlparse(url)
-    if parsed.scheme in {"http", "https"}:
-        host = parsed.netloc
-        path = parsed.path
-        if path.endswith(".git"):
-            path = path[:-4]
-        slug = path.strip("/")
-    else:
+    host = parsed.hostname
+    path = parsed.path
+
+    if host is None and "@" in url and ":" in url:
+        user_host, path = url.split(":", 1)
+        host = user_host.split("@")[-1]
+
+    if not host:
         host = "github.com"
-        slug = url.strip("/")
+        if not path:
+            path = url
+
+    if path.endswith(".git"):
+        path = path[:-4]
+    slug = path.strip("/")
 
     if host.endswith("github.com"):
         return f"https://api.github.com/repos/{slug}/zipball"
