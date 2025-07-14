@@ -68,23 +68,23 @@ def collect_files(
             exclude.append(".git/**")
 
     for file in root.rglob("*"):
-        rel = file.relative_to(root)
-        rel_path = str(rel).replace("\\", "/")
-        if not file.is_file():
-            continue
-        if not any(fnmatch.fnmatch(rel_path, pattern) for pattern in include):
-            continue
-        if any(fnmatch.fnmatch(rel_path, pattern) for pattern in exclude):
-            continue
-        if is_binary_path(file, strict=binary_strict):
-            continue
         try:
+            rel = file.relative_to(root)
+            rel_path = str(rel).replace("\\", "/")
+            if not file.is_file():
+                continue
+            if not any(fnmatch.fnmatch(rel_path, pattern) for pattern in include):
+                continue
+            if any(fnmatch.fnmatch(rel_path, pattern) for pattern in exclude):
+                continue
+            if is_binary_path(file, strict=binary_strict):
+                continue
             stat = file.stat()
             if not os.access(file, os.R_OK):
                 continue
+            if stat.st_size > max_size:
+                continue
+            files.append(FileInfo(path=rel, size=stat.st_size, mtime=stat.st_mtime))
         except OSError:
             continue
-        if stat.st_size > max_size:
-            continue
-        files.append(FileInfo(path=rel, size=stat.st_size, mtime=stat.st_mtime))
     return files
